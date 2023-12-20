@@ -7,7 +7,7 @@ class UserRepository
 {
     public function __construct(
         private \PDO $pdo
-    ) {}
+    ) { }
 
     public function findByEmail(string $email): ?User
     {
@@ -34,5 +34,18 @@ class UserRepository
         $stmt->bindValue('1', $user->getPassword());
         $stmt->bindValue('2', $user->getid());
         return $stmt->execute();
+    }
+
+    public function saveAdminUser(User $user): bool
+    {
+    $name = $user->name;
+    $email = $user->email;
+    $hash = password_hash($user->getPassword(), PASSWORD_ARGON2ID);$hash = password_hash($user->getPassword(), PASSWORD_ARGON2ID);
+    $sqlInsert = 'INSERT INTO users(name, email, password) VALUES (?,?,?);';
+    $stmt = $this->pdo->prepare($sqlInsert);
+    $stmt->bindParam(1, $name);
+    $stmt->bindParam(2, $email);
+    $stmt->bindParam(3, $hash);
+    return $stmt->execute();
     }
 }
